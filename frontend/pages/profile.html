@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Профиль — FitPartner</title>
+<link rel="stylesheet" href="../css/style.css">
+<style>
+.prof-wrap{max-width:640px;padding:28px 32px;}
+.prof-header{display:flex;align-items:center;gap:24px;margin-bottom:28px;background:var(--dark2);border:var(--border);border-radius:var(--radius);padding:24px;}
+.prof-name{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:1px;}
+.prof-tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px;}
+.avatar-upload{position:relative;cursor:pointer;flex-shrink:0;}
+.avatar-upload:hover .av-overlay{opacity:1;}
+.av-overlay{position:absolute;inset:0;border-radius:20px;background:rgba(0,0,0,0.65);display:flex;align-items:center;justify-content:center;font-size:24px;opacity:0;transition:opacity 0.2s;}
+.sec-card{background:var(--dark2);border:var(--border);border-radius:var(--radius);padding:24px;margin-bottom:20px;}
+.sec-card-title{font-weight:700;font-size:15px;margin-bottom:18px;display:flex;align-items:center;gap:8px;}
+@media(max-width:768px){.prof-wrap{padding:16px;}.prof-header{flex-direction:column;text-align:center;}}
+</style>
+</head>
+<body>
+<nav class="app-nav">
+  <div class="logo">FP</div>
+  <a href="/pages/dashboard.html" class="nav-item" data-page="dashboard">🏠</a>
+  <a href="/pages/partners.html" class="nav-item" data-page="partners">🏋️</a>
+  <a href="/pages/messages.html" class="nav-item" data-page="messages">💬<span class="notif" id="msg-badge">0</span></a>
+  <a href="/pages/profile.html" class="nav-item active" data-page="profile">👤</a>
+  <div class="nav-spacer"></div>
+</nav>
+<div class="app-content">
+  <div class="page-header">
+    <div class="page-title">👤 МОЙ ПРОФИЛЬ</div>
+    <button class="btn btn-primary btn-sm" id="btn-save" onclick="saveProfile()">Сохранить</button>
+  </div>
+  <div class="prof-wrap">
+    <div class="prof-header" id="prof-header"><div class="loading-center"><span class="spinner"></span></div></div>
+
+    <div class="sec-card">
+      <div class="sec-card-title">✏️ Основная информация</div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Имя</label><input class="form-control" type="text" id="e-name"></div>
+        <div class="form-group"><label class="form-label">Возраст</label><input class="form-control" type="number" id="e-age" min="14" max="80"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Пол</label>
+          <select class="form-control" id="e-gender"><option value="">—</option><option value="male">Мужской</option><option value="female">Женский</option></select>
+        </div>
+        <div class="form-group"><label class="form-label">Телефон</label><input class="form-control" type="tel" id="e-phone"></div>
+      </div>
+    </div>
+
+    <div class="sec-card">
+      <div class="sec-card-title">🏋️ О тренировках</div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Уровень</label>
+          <select class="form-control" id="e-level">
+            <option value="beginner">Новичок</option><option value="intermediate">Средний</option><option value="advanced">Продвинутый</option>
+          </select>
+        </div>
+        <div class="form-group"><label class="form-label">Район</label>
+          <select class="form-control" id="e-district">
+            <option value="Алматы">Любой район</option><option>Алмалинский</option><option>Бостандыкский</option>
+            <option>Ауэзовский</option><option>Жетысуский</option><option>Медеуский</option><option>Наурызбайский</option><option>Турксибский</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group"><label class="form-label">Цель / Вид спорта</label>
+        <select class="form-control" id="e-goals">
+          <option value="">—</option>
+          <option>🏃 Бег и кардио</option><option>🚶 Ходьба и здоровье</option><option>🏋️ Тренажёрный зал</option>
+          <option>💪 Набор массы</option><option>🔥 Похудение</option><option>🎯 Рельеф и тонус</option>
+          <option>🥊 Бокс</option><option>🥋 MMA / Единоборства</option><option>🤸 CrossFit</option>
+          <option>⚡ Функциональный тренинг</option><option>🧘 Йога</option><option>🤸‍♀️ Растяжка и гибкость</option>
+          <option>🏊 Плавание</option><option>🚴 Велоспорт</option><option>⚽ Футбол</option>
+          <option>🏀 Баскетбол</option><option>🎾 Теннис</option><option>🏠 Домашние тренировки</option>
+          <option>💪 Силовые показатели</option><option>🧗 Скалолазание</option><option>💃 Танцы и аэробика</option><option>🌿 Реабилитация</option>
+        </select>
+      </div>
+      <div class="form-group"><label class="form-label">Расписание</label>
+        <select class="form-control" id="e-schedule">
+          <option value="">—</option><option>Утро (6:00–10:00)</option><option>День (10:00–16:00)</option>
+          <option>Вечер (17:00–21:00)</option><option>Гибкий график</option><option>Только выходные</option>
+        </select>
+      </div>
+      <div class="form-group"><label class="form-label">О себе</label>
+        <textarea class="form-control" id="e-bio" rows="4" placeholder="Расскажи о себе и своих тренировках..."></textarea>
+      </div>
+    </div>
+
+    <div class="sec-card">
+      <div class="sec-card-title">💳 Подписка</div>
+      <div id="sub-info"><div class="loading-center"><span class="spinner"></span></div></div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:8px;">
+      <a href="/pages/contact.html" class="btn btn-ghost">📞 Поддержка</a>
+      <button class="btn btn-danger" onclick="logout()">🚪 Выйти</button>
+    </div>
+  </div>
+</div>
+<input type="file" id="avatar-file" accept="image/*" style="display:none" onchange="uploadAvatar(this)">
+<script src="../js/api.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', async () => {
+  if (!Auth.requireAuth()) return;
+  try {
+    const data = await api.me();
+    Auth.setUser(data.user);
+    renderHeader(data.user);
+    fillForm(data.user);
+    renderSub(data.user);
+  } catch {}
+});
+
+function renderHeader(u) {
+  const isF = u.gender === 'female';
+  document.getElementById('prof-header').innerHTML = `
+    <div>
+  <div class="avatar-upload" onclick="document.getElementById('avatar-file').click()" title="Нажмите для смены фото">
+    ${u.avatar ? `<img src="${u.avatar}" class="avatar-img-xl" alt="">` : `<div class="avatar avatar-xl ${isF?'avatar-female':''}">${initials(u.name)}</div>`}
+    <div class="av-overlay">📷</div>
+  </div>
+
+  ${u.avatar ? `<button onclick="deleteAvatar()" class="btn btn-danger btn-sm" style="margin-top:10px;width:100%;">Удалить фото</button>` : ''}
+</div>
+    
+    <div>
+      <div class="prof-name">${u.name}${u.subscription_expires && new Date(u.subscription_expires)>new Date()?' ⭐':''}</div>
+      <div style="color:var(--text2);font-size:13px;">${u.email}</div>
+      <div class="prof-tags">
+        <span class="badge badge-green">${LEVELS[u.fitness_level]||'Новичок'}</span>
+        ${u.goals?`<span class="badge badge-blue">${u.goals}</span>`:''}
+        ${u.district?`<span class="badge badge-orange">📍 ${u.district}</span>`:''}
+      </div>
+    </div>`;
+}
+
+async function uploadAvatar(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const form = new FormData();
+  form.append('avatar', file);
+  try {
+    const res = await fetch('/api/auth/avatar',{method:'POST',headers:{'Authorization':'Bearer '+Auth.getToken()},body:form});
+    const data = await res.json();
+    if (!res.ok) { toast(data.error,'error'); return; }
+    toast('Фото обновлено! ✓','success');
+    const me = await api.me();
+    Auth.setUser(me.user);
+    renderHeader(me.user);
+  } catch(e) { toast(e.message,'error'); }
+}
+
+function fillForm(u) {
+  document.getElementById('e-name').value = u.name||'';
+  document.getElementById('e-age').value = u.age||'';
+  document.getElementById('e-gender').value = u.gender||'';
+  document.getElementById('e-phone').value = u.phone||'';
+  document.getElementById('e-level').value = u.fitness_level||'beginner';
+  document.getElementById('e-district').value = u.district||'Алматы';
+  document.getElementById('e-goals').value = u.goals||'';
+  document.getElementById('e-schedule').value = u.schedule||'';
+  document.getElementById('e-bio').value = u.bio||'';
+}
+
+function renderSub(u) {
+  const el = document.getElementById('sub-info');
+  const exp = u.subscription_expires ? new Date(u.subscription_expires) : null;
+  const active = exp && exp > new Date();
+  if (active) {
+    const days = Math.ceil((exp - new Date()) / 86400000);
+    el.innerHTML = `
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+        <div>
+          <div style="color:var(--neon);font-weight:700;">✅ Premium активна</div>
+          <div style="color:var(--text2);font-size:13px;margin-top:3px;">Истекает ${formatDate(u.subscription_expires)} (${days} дн.)</div>
+        </div>
+        <a href="/pages/subscription.html" class="btn btn-outline btn-sm">Продлить</a>
+      </div>`;
+  } else {
+    el.innerHTML = `
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+        <div>
+          <div style="color:var(--text2);font-weight:700;">Базовый доступ</div>
+          <div style="color:var(--text2);font-size:13px;margin-top:3px;">Оформите Premium для лайков и фото в чате</div>
+        </div>
+        <a href="/pages/subscription.html" class="btn btn-primary btn-sm">Оформить от 800₸</a>
+      </div>`;
+  }
+}
+
+async function saveProfile() {
+  const btn = document.getElementById('btn-save');
+  setLoading(btn, true, 'Сохранение...');
+  try {
+    const data = await api.updateProfile({
+      name:val('e-name'),age:val('e-age')||null,gender:val('e-gender')||null,
+      phone:val('e-phone'),fitness_level:val('e-level'),goals:val('e-goals'),
+      schedule:val('e-schedule'),bio:val('e-bio'),district:val('e-district')
+    });
+    Auth.setUser(data.user);
+    renderHeader(data.user);
+    toast('Профиль обновлён! ✓','success');
+  } catch(e) { toast(e.message,'error'); }
+  setLoading(btn, false, 'Сохранить');
+}
+
+function logout() { Auth.clear(); window.location.href='/pages/index.html'; }
+
+function logout() { 
+  Auth.clear(); 
+  window.location.href='/pages/index.html'; 
+}
+
+// 👇 ВОТ СЮДА ВСТАВЛЯЕШЬ
+async function deleteAvatar() {
+  if (!confirm('Удалить фото?')) return;
+
+  try {
+    const res = await fetch('/api/auth/avatar', {
+      method: 'DELETE',
+      headers: {
+        'Authorization': 'Bearer ' + Auth.getToken()
+      }
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      toast(data.error, 'error');
+      return;
+    }
+
+    toast('Фото удалено ✓', 'success');
+
+    const me = await api.me();
+    Auth.setUser(me.user);
+    renderHeader(me.user);
+
+  } catch (e) {
+    toast('Ошибка удаления', 'error');
+  }
+}
+</script>
+</script>
+</body>
+</html>

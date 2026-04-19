@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Вход — FitPartner</title>
+<link rel="stylesheet" href="../css/style.css">
+<style>
+body{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px;background:radial-gradient(ellipse 60% 50% at 50% 0%,rgba(0,255,135,0.08),transparent),var(--dark);}
+.auth-box{width:100%;max-width:420px;}
+.auth-logo{font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:2px;background:linear-gradient(135deg,var(--neon),var(--neon2));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;text-align:center;margin-bottom:4px;}
+.auth-city{text-align:center;color:var(--text2);font-size:12px;letter-spacing:3px;margin-bottom:32px;}
+.auth-card{background:var(--dark2);border:var(--border);border-radius:20px;padding:36px;}
+.auth-title{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:1px;margin-bottom:6px;}
+</style>
+</head>
+<body>
+<div class="auth-box">
+  <div class="auth-logo">FitPartner</div>
+  <div class="auth-city">АЛМАТЫ</div>
+  <div class="auth-card">
+    <div class="auth-title">ВХОД</div>
+    <p style="color:var(--text2);font-size:13px;margin-bottom:24px;">С возвращением! Продолжи искать партнёра.</p>
+    <div class="form-group">
+      <label class="form-label">Email</label>
+      <input class="form-control" type="email" id="email" placeholder="your@email.com" autofocus>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Пароль</label>
+      <input class="form-control" type="password" id="password" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()">
+    </div>
+    <div class="form-error" id="err"></div>
+    <button class="btn btn-primary btn-full" style="margin-top:8px;" id="btn-login" onclick="doLogin()">Войти →</button>
+    <div style="text-align:center;margin-top:20px;color:var(--text2);font-size:13px;">
+      Нет аккаунта? <a href="/pages/register.html" style="color:var(--neon);font-weight:700;">Зарегистрироваться</a>
+    </div>
+    <div style="text-align:center;margin-top:8px;">
+      <a href="/pages/index.html" style="color:var(--text2);font-size:13px;">← На главную</a>
+    </div>
+  </div>
+</div>
+<script src="../js/api.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => Auth.requireGuest());
+async function doLogin() {
+  const err = document.getElementById('err');
+  const btn = document.getElementById('btn-login');
+  err.classList.remove('show');
+  setLoading(btn, true, 'Входим...');
+  try {
+    const data = await api.login({ email: val('email'), password: val('password') });
+    Auth.setToken(data.token);
+    Auth.setUser(data.user);
+    toast('Добро пожаловать! 💪', 'success');
+    setTimeout(() => window.location.href = '/pages/dashboard.html', 600);
+  } catch(e) {
+    err.textContent = e.message; err.classList.add('show');
+    setLoading(btn, false, 'Войти →');
+  }
+}
+</script>
+</body>
+</html>

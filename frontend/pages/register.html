@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Регистрация — FitPartner</title>
+<link rel="stylesheet" href="../css/style.css">
+<style>
+body{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px;background:radial-gradient(ellipse 60% 50% at 50% 0%,rgba(0,255,135,0.08),transparent),var(--dark);}
+.auth-box{width:100%;max-width:580px;}
+.auth-logo{font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:2px;background:linear-gradient(135deg,var(--neon),var(--neon2));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;text-align:center;margin-bottom:4px;}
+.auth-city{text-align:center;color:var(--text2);font-size:12px;letter-spacing:3px;margin-bottom:28px;}
+.auth-card{background:var(--dark2);border:var(--border);border-radius:20px;padding:36px;}
+.steps-bar{display:flex;gap:4px;margin-bottom:28px;}
+.step-dot{flex:1;height:4px;border-radius:2px;background:var(--dark5);transition:background 0.3s;}
+.step-dot.done{background:var(--neon);}
+.step-dot.active{background:rgba(0,255,135,0.5);}
+.step-label{font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:1px;color:var(--text2);margin-bottom:20px;}
+</style>
+</head>
+<body>
+<div class="auth-box">
+  <div class="auth-logo">FitPartner</div>
+  <div class="auth-city">АЛМАТЫ</div>
+  <div class="auth-card">
+    <div class="steps-bar">
+      <div class="step-dot active" id="sd1"></div>
+      <div class="step-dot" id="sd2"></div>
+      <div class="step-dot" id="sd3"></div>
+    </div>
+    <div class="step-label" id="step-label">ШАГ 1 / 3 — ОСНОВНОЕ</div>
+
+    <div id="step1">
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Имя *</label><input class="form-control" type="text" id="name" placeholder="Как тебя зовут?" autofocus></div>
+        <div class="form-group"><label class="form-label">Возраст</label><input class="form-control" type="number" id="age" placeholder="25" min="14" max="80"></div>
+      </div>
+      <div class="form-group"><label class="form-label">Email *</label><input class="form-control" type="email" id="email" placeholder="your@email.com"></div>
+      <div class="form-group"><label class="form-label">Пароль * (мин. 6 символов)</label><input class="form-control" type="password" id="password" placeholder="••••••••"></div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Пол</label>
+          <select class="form-control" id="gender"><option value="">—</option><option value="male">Мужской</option><option value="female">Женский</option></select>
+        </div>
+        <div class="form-group"><label class="form-label">Номер телефона</label><input class="form-control" type="tel" id="phone" placeholder="+7 777 000 00 00"></div>
+      </div>
+      <div class="form-error" id="err1"></div>
+      <button class="btn btn-primary btn-full" onclick="next1()">Далее →</button>
+      <div style="text-align:center;margin-top:16px;color:var(--text2);font-size:13px;">Есть аккаунт? <a href="/pages/login.html" style="color:var(--neon);font-weight:700;">Войти</a></div>
+    </div>
+
+    <div id="step2" style="display:none;">
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Уровень подготовки</label>
+          <select class="form-control" id="level">
+            <option value="beginner">Новичок</option>
+            <option value="intermediate">Средний</option>
+            <option value="advanced">Продвинутый</option>
+          </select>
+        </div>
+        <div class="form-group"><label class="form-label">Район Алматы</label>
+          <select class="form-control" id="district">
+            <option value="Алматы">Любой район</option>
+            <option>Алмалинский</option><option>Бостандыкский</option><option>Ауэзовский</option>
+            <option>Жетысуский</option><option>Медеуский</option><option>Наурызбайский</option><option>Турксибский</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group"><label class="form-label">Цели и вид спорта</label>
+        <select class="form-control" id="goals">
+          <option value="">— выберите —</option>
+          <option>🏃 Бег и кардио</option>
+          <option>🚶 Ходьба и здоровье</option>
+          <option>🏋️ Тренажёрный зал</option>
+          <option>💪 Набор массы</option>
+          <option>🔥 Похудение</option>
+          <option>🎯 Рельеф и тонус</option>
+          <option>🥊 Бокс</option>
+          <option>🥋 MMA / Единоборства</option>
+          <option>🤸 CrossFit</option>
+          <option>⚡ Функциональный тренинг</option>
+          <option>🧘 Йога</option>
+          <option>🤸‍♀️ Растяжка и гибкость</option>
+          <option>🏊 Плавание</option>
+          <option>🚴 Велоспорт</option>
+          <option>⚽ Футбол</option>
+          <option>🏀 Баскетбол</option>
+          <option>🎾 Теннис</option>
+          <option>🏠 Домашние тренировки</option>
+          <option>💪 Силовые показатели</option>
+          <option>🧗 Скалолазание</option>
+          <option>💃 Танцы и аэробика</option>
+          <option>🌿 Реабилитация</option>
+        </select>
+      </div>
+      <div class="form-group"><label class="form-label">Расписание тренировок</label>
+        <select class="form-control" id="schedule">
+          <option value="">— когда тренируетесь —</option>
+          <option>Утро (6:00–10:00)</option>
+          <option>День (10:00–16:00)</option>
+          <option>Вечер (17:00–21:00)</option>
+          <option>Гибкий график</option>
+          <option>Только выходные</option>
+        </select>
+      </div>
+      <div style="display:flex;gap:10px;">
+        <button class="btn btn-ghost" onclick="goStep(1)">← Назад</button>
+        <button class="btn btn-primary btn-full" onclick="goStep(3)">Далее →</button>
+      </div>
+    </div>
+
+    <div id="step3" style="display:none;">
+      <div class="form-group">
+        <label class="form-label">О себе</label>
+        <textarea class="form-control" id="bio" rows="4" placeholder="Расскажи немного о себе, своих тренировках и чего ожидаешь от партнёра..."></textarea>
+        <div class="form-hint">Чем подробнее — тем легче найдёте друг друга</div>
+      </div>
+      <div class="form-error" id="err3"></div>
+      <div style="display:flex;gap:10px;">
+        <button class="btn btn-ghost" onclick="goStep(2)">← Назад</button>
+        <button class="btn btn-primary btn-full" id="btn-reg" onclick="doRegister()">Зарегистрироваться 🚀</button>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="../js/api.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => Auth.requireGuest());
+let curStep = 1;
+function next1() {
+  const err = document.getElementById('err1');
+  err.classList.remove('show');
+  if (!val('name')) { err.textContent='Введите имя'; err.classList.add('show'); return; }
+  if (!val('email')) { err.textContent='Введите email'; err.classList.add('show'); return; }
+  if (val('password').length < 6) { err.textContent='Пароль минимум 6 символов'; err.classList.add('show'); return; }
+  goStep(2);
+}
+function goStep(n) {
+  document.getElementById('step'+curStep).style.display='none';
+  curStep=n;
+  document.getElementById('step'+curStep).style.display='block';
+  ['sd1','sd2','sd3'].forEach((id,i)=>{
+    const el=document.getElementById(id);
+    el.classList.remove('done','active');
+    if(i+1<curStep) el.classList.add('done');
+    else if(i+1===curStep) el.classList.add('active');
+  });
+  const labels=['ШАГ 1 / 3 — ОСНОВНОЕ','ШАГ 2 / 3 — О ТРЕНИРОВКАХ','ШАГ 3 / 3 — О СЕБЕ'];
+  document.getElementById('step-label').textContent=labels[n-1];
+}
+async function doRegister() {
+  const btn=document.getElementById('btn-reg');
+  const err=document.getElementById('err3');
+  err.classList.remove('show');
+  setLoading(btn,true,'Регистрируемся...');
+  try {
+    const data = await api.register({
+      name:val('name'),email:val('email'),password:val('password'),phone:val('phone'),
+      age:val('age')||null,gender:val('gender')||null,fitness_level:val('level'),
+      goals:val('goals'),schedule:val('schedule'),bio:val('bio'),district:val('district')
+    });
+    Auth.setToken(data.token); Auth.setUser(data.user);
+    toast('Добро пожаловать в FitPartner! 🎉','success');
+    setTimeout(()=>window.location.href='/pages/dashboard.html',700);
+  } catch(e) {
+    err.textContent=e.message; err.classList.add('show');
+    setLoading(btn,false,'Зарегистрироваться 🚀');
+  }
+}
+</script>
+</body>
+</html>

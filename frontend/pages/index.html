@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FitPartner Алматы — Найди партнёра для тренировок</title>
+<meta name="description" content="Найди партнёра для тренировок в Алматы. Бесплатная регистрация. 8 районов города.">
+<link rel="stylesheet" href="../css/style.css">
+<style>
+body { background:radial-gradient(ellipse 80% 50% at 50% -5%,rgba(0,255,135,0.12),transparent),radial-gradient(ellipse 60% 40% at 85% 100%,rgba(0,212,255,0.08),transparent),var(--dark); }
+
+/* Floating elements for hero visual depth */
+.hero-bg { position:absolute; inset:0; overflow:hidden; pointer-events:none; }
+.hero-blob { position:absolute; border-radius:50%; filter:blur(80px); animation:blobFloat 8s ease-in-out infinite; }
+.blob-1 { width:400px; height:400px; background:rgba(0,255,135,0.06); top:10%; left:5%; animation-delay:0s; }
+.blob-2 { width:300px; height:300px; background:rgba(0,212,255,0.05); top:30%; right:10%; animation-delay:3s; }
+.blob-3 { width:200px; height:200px; background:rgba(124,58,237,0.06); bottom:20%; left:30%; animation-delay:5s; }
+@keyframes blobFloat { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-20px)} }
+
+.hero { position:relative; overflow:hidden; }
+
+/* Plans Preview */
+.plans-preview { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; }
+.plan-prev { background:var(--dark3); border:var(--border); border-radius:14px; padding:20px; text-align:center; transition:all 0.3s; }
+.plan-prev:hover { border-color:rgba(0,255,135,0.2); }
+.plan-prev.hot { border-color:rgba(0,255,135,0.4); background:rgba(0,255,135,0.05); }
+.plan-prev .pname { font-family:'Bebas Neue',sans-serif; font-size:20px; letter-spacing:1px; }
+.plan-prev .pprice { font-size:28px; font-weight:800; color:var(--neon); margin:6px 0 4px; }
+.plan-prev .pper { font-size:12px; color:var(--text2); }
+
+/* Goal tags */
+.goals-cloud { display:flex; flex-wrap:wrap; gap:10px; justify-content:center; padding:24px 0; }
+.goal-tag { padding:8px 18px; border-radius:100px; font-size:13px; font-weight:600; background:var(--dark3); border:var(--border); cursor:default; transition:all 0.25s; }
+.goal-tag:hover { border-color:var(--neon); color:var(--neon); transform:scale(1.05); }
+
+/* Stats section */
+.stats-section { background:var(--dark2); border-top:var(--border); border-bottom:var(--border); padding:40px 0; }
+.stats-inner { display:flex; justify-content:center; gap:80px; flex-wrap:wrap; max-width:1000px; margin:0 auto; padding:0 32px; }
+.stat-item { text-align:center; }
+.stat-num { font-family:'Bebas Neue',sans-serif; font-size:52px; background:linear-gradient(135deg,var(--neon),var(--neon2)); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; line-height:1; }
+.stat-label { font-size:12px; color:var(--text2); letter-spacing:2px; margin-top:4px; text-transform:uppercase; }
+
+/* How it works scroll animation */
+.fade-on-scroll { opacity:0; transform:translateY(30px); transition:opacity 0.7s, transform 0.7s; }
+.fade-on-scroll.visible { opacity:1; transform:translateY(0); }
+
+/* CTA section */
+.cta-sec { background:linear-gradient(135deg,rgba(0,255,135,0.12),rgba(0,212,255,0.08)); border:1px solid rgba(0,255,135,0.2); border-radius:24px; padding:60px; text-align:center; margin:40px 0; }
+.cta-title { font-family:'Bebas Neue',sans-serif; font-size:52px; letter-spacing:2px; margin-bottom:16px; }
+.cta-text { font-size:16px; color:var(--text2); max-width:500px; margin:0 auto 32px; }
+
+footer { text-align:center; padding:40px; color:var(--text2); font-size:13px; border-top:var(--border); }
+.footer-links { display:flex; gap:24px; justify-content:center; margin-bottom:16px; flex-wrap:wrap; }
+.footer-links a { color:var(--text2); transition:color 0.2s; }
+.footer-links a:hover { color:var(--neon); }
+
+@media(max-width:768px) {
+  .plans-preview { grid-template-columns:1fr; }
+  .stats-inner { gap:40px; }
+  .cta-sec { padding:36px 20px; }
+  .cta-title { font-size:36px; }
+}
+</style>
+</head>
+<body>
+
+<!-- Navigation -->
+<nav class="lnav">
+  <div>
+    <div class="logo-big">FitPartner</div>
+    <div class="logo-sub">АЛМАТЫ</div>
+  </div>
+  <div style="display:flex;gap:10px;align-items:center;">
+    <a href="/pages/contact.html" class="btn btn-ghost btn-sm" style="display:none;" id="nav-contact">Контакты</a>
+    <a href="/pages/login.html" class="btn btn-ghost btn-sm">Войти</a>
+    <a href="/pages/register.html" class="btn btn-primary btn-sm">Регистрация</a>
+  </div>
+</nav>
+
+<!-- Hero -->
+<section class="hero">
+  <div class="hero-bg">
+    <div class="hero-blob blob-1"></div>
+    <div class="hero-blob blob-2"></div>
+    <div class="hero-blob blob-3"></div>
+  </div>
+  <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:100px 24px 80px;min-height:calc(100vh - 70px);position:relative;">
+    <div class="hero-pill"><span class="pulse-dot"></span>Регистрация бесплатна • Только Алматы</div>
+
+    <h1>ТРЕНИРУЙСЯ<br><span class="g">НЕ ОДИН —</span><br>ТРЕНИРУЙСЯ</h1>
+    <h1 style="font-family:'Bebas Neue',sans-serif;font-size:clamp(56px,11vw,120px);line-height:0.88;letter-spacing:2px;animation:fadeUp 0.6s 0.15s ease both;background:linear-gradient(135deg,var(--neon),var(--neon2));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;">СИЛЬНЕЕ</h1>
+
+    <p class="hero-text">Находи партнёров по фитнесу в Алматы. Сообщения бесплатно — никаких барьеров. Просто зарегистрируйся и начни тренировки.</p>
+
+    <div class="hero-btns">
+      <a href="/pages/register.html" class="btn btn-primary btn-lg">🔥 Найти партнёра бесплатно</a>
+      <a href="#how" class="btn btn-ghost btn-lg">Как это работает →</a>
+    </div>
+
+  </div>
+</section>
+
+<!-- Live stats -->
+<div class="stats-section">
+  <div class="stats-inner">
+    <div class="stat-item"><div class="stat-num" id="st-total">0</div><div class="stat-label">Участников в Алматы</div></div>
+    <div class="stat-item"><div class="stat-num">16+</div><div class="stat-label">Видов спорта</div></div>
+    <div class="stat-item"><div class="stat-num">8</div><div class="stat-label">Районов города</div></div>
+    <div class="stat-item"><div class="stat-num">💬</div><div class="stat-label">Чат бесплатно</div></div>
+  </div>
+</div>
+
+<!-- Features -->
+<section class="sec fade-on-scroll">
+  <h2 class="sec-title">ПОЧЕМУ FITPARTNER?</h2>
+  <div class="feat-grid">
+    <div class="feat-card">
+      <div class="feat-icon">💬</div>
+      <h3>Сообщения бесплатно</h3>
+      <p>Написать любому участнику можно без подписки. Никаких ограничений на общение — просто находите людей и договаривайтесь.</p>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon">📸</div>
+      <h3>Живые фото профилей</h3>
+      <p>Загружайте реальные фото — видите человека до первой встречи. Никаких анонимных силуэтов и сюрпризов при знакомстве.</p>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon">🎯</div>
+      <h3>16+ видов спорта</h3>
+      <p>Бег, йога, бокс, CrossFit, плавание, велоспорт и многое другое. Фильтруйте по цели и находите своих людей.</p>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon">📍</div>
+      <h3>По районам Алматы</h3>
+      <p>Ищите в своём районе или по всему городу. Удобно договориться о встрече рядом с домом или любимым залом.</p>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon">⚡</div>
+      <h3>Чат в реальном времени</h3>
+      <p>Мессенджер со статусом «онлайн», индикатором набора текста и мгновенной доставкой сообщений.</p>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon">🔒</div>
+      <h3>Безопасно и проверено</h3>
+      <p>Все данные защищены. Реальные профили с фото. Можно пожаловаться на подозрительного пользователя.</p>
+    </div>
+  </div>
+</section>
+
+<!-- Goals cloud -->
+<section style="padding:60px 48px;background:var(--dark2);border-top:var(--border);border-bottom:var(--border);" class="fade-on-scroll">
+  <h2 class="sec-title" style="margin-bottom:32px;">ТВОЙ ВИД СПОРТА — ЗДЕСЬ</h2>
+  <div class="goals-cloud">
+    <span class="goal-tag">🏃 Бег</span>
+    <span class="goal-tag">🚶 Ходьба</span>
+    <span class="goal-tag">🏋️ Тренажёрный зал</span>
+    <span class="goal-tag">🥊 Бокс</span>
+    <span class="goal-tag">🥋 MMA / Единоборства</span>
+    <span class="goal-tag">🤸 CrossFit</span>
+    <span class="goal-tag">🧘 Йога</span>
+    <span class="goal-tag">🤸‍♀️ Растяжка</span>
+    <span class="goal-tag">🏊 Плавание</span>
+    <span class="goal-tag">🚴 Велоспорт</span>
+    <span class="goal-tag">⚽ Футбол</span>
+    <span class="goal-tag">🏀 Баскетбол</span>
+    <span class="goal-tag">🎾 Теннис</span>
+    <span class="goal-tag">🏠 Домашние тренировки</span>
+    <span class="goal-tag">⚡ Функциональный тренинг</span>
+    <span class="goal-tag">💪 Набор массы</span>
+    <span class="goal-tag">🔥 Похудение</span>
+    <span class="goal-tag">🧗 Скалолазание</span>
+  </div>
+</section>
+
+<!-- How it works -->
+<section class="steps-sec" id="how">
+  <div class="sec fade-on-scroll">
+    <h2 class="sec-title">КАК ЭТО РАБОТАЕТ?</h2>
+    <div class="steps-grid">
+      <div class="step-box">
+        <div class="step-circle">1</div>
+        <h3>Зарегистрируйся</h3>
+        <p>Создай профиль за 2 минуты. Добавь фото, укажи цели и свободное время.</p>
+      </div>
+      <div class="step-box">
+        <div class="step-circle">2</div>
+        <h3>Найди партнёра</h3>
+        <p>Фильтруй по виду спорта, уровню и районам. Смотри анкеты и фото.</p>
+      </div>
+      <div class="step-box">
+        <div class="step-circle">3</div>
+        <h3>Напиши бесплатно</h3>
+        <p>Чат доступен без подписки. Договоритесь о времени и месте прямо здесь.</p>
+      </div>
+      <div class="step-box">
+        <div class="step-circle">4</div>
+        <h3>Тренируйся!</h3>
+        <p>Встретьтесь и вместе покоряйте новые цели. Мотивация в 2 раза сильнее.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Pricing preview -->
+<section class="sec fade-on-scroll">
+  <h2 class="sec-title">PREMIUM ПЛАНЫ</h2>
+  <p style="text-align:center;color:var(--text2);font-size:15px;margin-bottom:40px;">Базовое использование бесплатно. Premium открывает расширенные функции.</p>
+  <div style="max-width:720px;margin:0 auto;">
+    <div class="plans-preview">
+      <div class="plan-prev">
+        <div class="pname">1 Месяц</div>
+        <div class="pprice">800₸</div>
+        <div class="pper">30 дней</div>
+      </div>
+      <div class="plan-prev hot">
+        <div style="font-size:11px;color:var(--neon);font-weight:700;letter-spacing:1px;margin-bottom:6px;">⭐ ПОПУЛЯРНЫЙ</div>
+        <div class="pname">3 Месяца</div>
+        <div class="pprice">2000₸</div>
+        <div class="pper">90 дней · экономия 33%</div>
+      </div>
+      <div class="plan-prev">
+        <div class="pname">6 Месяцев</div>
+        <div class="pprice">3500₸</div>
+        <div class="pper">180 дней · экономия 45%</div>
+      </div>
+    </div>
+    <div style="text-align:center;margin-top:24px;color:var(--text2);font-size:13px;">
+      💬 Сообщения партнёрам — всегда бесплатно · Premium: лайки, фото в чате, все анкеты
+    </div>
+    <div style="text-align:center;margin-top:20px;">
+      <a href="/pages/register.html" class="btn btn-primary">Начать бесплатно →</a>
+    </div>
+  </div>
+</section>
+
+<!-- Reviews -->
+<section class="sec fade-on-scroll" style="padding-top:20px;">
+  <h2 class="sec-title">ЧТО ГОВОРЯТ УЧАСТНИКИ</h2>
+  <div class="reviews-grid">
+    <div class="review-card">
+      <div class="review-stars">★★★★★</div>
+      <div class="review-text">Нашёл партнёра для утренних пробежек в Бостандыкском районе за 2 дня. Теперь бегаем вместе каждое утро уже 3 месяца — результаты впечатляют!</div>
+      <div class="review-author">
+        <div class="review-avatar">АД</div>
+        <div><div class="review-name">Алишер Д.</div><div class="review-meta">Бег • Бостандыкский</div></div>
+      </div>
+    </div>
+    <div class="review-card">
+      <div class="review-stars">★★★★★</div>
+      <div class="review-text">Нашла подругу для йоги и растяжки прямо в соседнем доме. Теперь занимаемся 4 раза в неделю. Сайт удобный, чат работает отлично!</div>
+      <div class="review-author">
+        <div class="review-avatar" style="background:linear-gradient(135deg,#ff6b9d,#c0392b);">ЗМ</div>
+        <div><div class="review-name">Зарина М.</div><div class="review-meta">Йога • Алмалинский</div></div>
+      </div>
+    </div>
+    <div class="review-card">
+      <div class="review-stars">★★★★☆</div>
+      <div class="review-text">Удобно что можно написать сразу без подписки. Нашёл ребят для CrossFit секции и теперь тренируемся командой. Рекомендую всем!</div>
+      <div class="review-author">
+        <div class="review-avatar">НС</div>
+        <div><div class="review-name">Нурлан С.</div><div class="review-meta">CrossFit • Медеуский</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<div class="sec fade-on-scroll" style="padding-top:20px;">
+  <div class="cta-sec">
+    <div class="cta-title">НАЧНИ ТРЕНИРОВКИ<br>СЕГОДНЯ</div>
+    <div class="cta-text">Тысячи людей в Алматы уже ищут партнёра. Присоединяйся — регистрация бесплатная и занимает 2 минуты.</div>
+    <div style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap;">
+      <a href="/pages/register.html" class="btn btn-primary btn-lg">🔥 Зарегистрироваться</a>
+      <a href="/pages/contact.html" class="btn btn-ghost btn-lg">Задать вопрос</a>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-links">
+    <a href="/pages/index.html">Главная</a>
+    <a href="/pages/contact.html">Контакты</a>
+    <a href="/pages/login.html">Войти</a>
+    <a href="/pages/register.html">Регистрация</a>
+    <a href="/pages/subscription.html">Premium</a>
+  </div>
+  <div>© 2024 FitPartner Алматы — Платформа для поиска партнёра для тренировок 💪</div>
+</footer>
+
+<script>
+document.addEventListener('DOMContentLoaded', async () => {
+  try {
+    const data = await fetch('/api/users/count').then(r => r.json());
+    animateNum('cn-users', data.total);
+    animateNum('st-total', data.total);
+  } catch {
+    animateNum('cn-users', 0);
+    animateNum('st-total', 0);
+  }
+
+  // Scroll animations
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+  }, { threshold: 0.1 });
+
+  document.querySelectorAll('.fade-on-scroll').forEach(el => observer.observe(el));
+});
+
+function animateNum(id, to, dur = 1800) {
+  const el = document.getElementById(id);
+  if (!el || to === 0) { if(el) el.textContent = '0'; return; }
+  const step = to / (dur / 16);
+  let cur = 0;
+  const t = setInterval(() => {
+    cur = Math.min(cur + step, to);
+    el.textContent = Math.floor(cur);
+    if (cur >= to) clearInterval(t);
+  }, 16);
+}
+</script>
+</body>
+</html>

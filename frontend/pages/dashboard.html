@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Главная — FitPartner</title>
+<link rel="stylesheet" href="../css/style.css">
+<style>
+.dash-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:20px;padding:28px 32px;}
+.stat-card{background:var(--dark3);border:var(--border);border-radius:var(--radius);padding:24px;transition:all 0.3s;cursor:default;}
+.stat-card:hover{transform:translateY(-3px);border-color:rgba(0,255,135,0.15);}
+.stat-icon{font-size:32px;margin-bottom:12px;}
+.stat-num{font-family:'Bebas Neue',sans-serif;font-size:40px;background:linear-gradient(135deg,var(--neon),var(--neon2));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;line-height:1;}
+.stat-label{color:var(--text2);font-size:13px;margin-top:6px;}
+.premium-banner{margin:0 32px 24px;background:linear-gradient(135deg,rgba(124,58,237,0.15),rgba(0,212,255,0.08));border:1px solid rgba(124,58,237,0.3);border-radius:var(--radius);padding:24px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;}
+.search-limit{margin:0 32px 24px;background:rgba(255,107,53,0.08);border:1px solid rgba(255,107,53,0.25);border-radius:12px;padding:16px 20px;display:flex;align-items:center;gap:12px;}
+.limit-bar{flex:1;height:6px;background:var(--dark4);border-radius:3px;overflow:hidden;}
+.limit-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--neon),var(--neon2));transition:width 0.5s;}
+.new-users-sec{padding:0 32px 32px;}
+.sec-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.sec-h{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1px;}
+.new-users-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:16px;}
+.mini-card{background:var(--dark3);border:var(--border);border-radius:var(--radius);padding:20px;transition:all 0.2s;cursor:pointer;}
+.mini-card:hover{transform:translateY(-4px);border-color:rgba(0,255,135,0.2);}
+.mini-card-top{display:flex;align-items:center;gap:12px;margin-bottom:12px;}
+.mini-tags{display:flex;gap:5px;flex-wrap:wrap;}
+@media(max-width:768px){.dash-grid,.new-users-sec{padding:16px;}.premium-banner,.search-limit{margin:0 16px 16px;}}
+</style>
+</head>
+<body>
+<nav class="app-nav">
+  <div class="logo">FP</div>
+  <a href="/pages/dashboard.html" class="nav-item active" data-page="dashboard" title="Главная">🏠</a>
+  <a href="/pages/partners.html" class="nav-item" data-page="partners" title="Партнёры">🏋️</a>
+  <a href="/pages/messages.html" class="nav-item" data-page="messages" title="Сообщения">💬<span class="notif" id="msg-badge">0</span></a>
+  <a href="/pages/profile.html" class="nav-item" data-page="profile" title="Профиль">👤</a>
+  <div class="nav-spacer"></div>
+</nav>
+
+<div class="app-content">
+  <div class="page-header">
+    <div class="page-title" id="greet">Главная</div>
+    <div style="color:var(--text2);font-size:13px;" id="date-str"></div>
+  </div>
+
+  <div id="premium-banner" style="display:none;" class="premium-banner">
+    <div>
+      <div style="font-weight:700;font-size:15px;margin-bottom:4px;">⭐ Оформите Premium подписку</div>
+      <div style="color:var(--text2);font-size:13px;">Лайки, фото в чате, все анкеты без лимита — от 800₸</div>
+    </div>
+    <a href="/pages/subscription.html" class="btn btn-primary btn-sm">Подключить →</a>
+  </div>
+
+  <div id="search-limit-bar" style="display:none;" class="search-limit">
+    <span style="font-size:14px;">🔍</span>
+    <div>
+      <div style="font-size:13px;font-weight:700;margin-bottom:4px;">Поисков сегодня: <span id="searches-used">0</span> / 10</div>
+      <div class="limit-bar"><div class="limit-fill" id="limit-fill" style="width:0%"></div></div>
+    </div>
+    <a href="/pages/subscription.html" style="font-size:12px;color:var(--neon);font-weight:700;white-space:nowrap;">Снять лимит →</a>
+  </div>
+
+  <div class="dash-grid">
+    <div class="stat-card">
+      <div class="stat-icon">👥</div>
+      <div class="stat-num" id="s-users">—</div>
+      <div class="stat-label">Участников в Алматы</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">💬</div>
+      <div class="stat-num" id="s-msgs">—</div>
+      <div class="stat-label">Непрочитанных</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">📅</div>
+      <div class="stat-num" id="s-days">—</div>
+      <div class="stat-label">Дней Premium</div>
+    </div>
+    <div class="stat-card" style="cursor:pointer;" onclick="window.location='/pages/partners.html'">
+      <div class="stat-icon">🔍</div>
+      <div style="font-size:16px;font-weight:700;margin-top:8px;">Найти партнёра</div>
+      <div class="stat-label" style="margin-top:4px;">Просмотр анкет →</div>
+    </div>
+  </div>
+
+  <div class="new-users-sec" style="margin-top:8px;">
+    <div class="sec-header">
+      <div class="sec-h">🆕 НОВЫЕ УЧАСТНИКИ</div>
+      <a href="/pages/partners.html" class="btn btn-ghost btn-sm">Все →</a>
+    </div>
+    <div class="new-users-row" id="new-users">
+      <div class="loading-center"><span class="spinner"></span></div>
+    </div>
+  </div>
+</div>
+
+<script src="../js/api.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', async () => {
+  if (!Auth.requireAuth()) return;
+  const user = Auth.getUser();
+
+  const h = new Date().getHours();
+  const gr = h<12?'Доброе утро':h<18?'Добрый день':'Добрый вечер';
+  document.getElementById('greet').textContent = `${gr}, ${user?.name?.split(' ')[0]||''}!`;
+  document.getElementById('date-str').textContent = new Date().toLocaleDateString('ru-RU',{weekday:'long',day:'numeric',month:'long'});
+
+  // Real user count
+  try {
+    const cnt = await api.getUserCount();
+    document.getElementById('s-users').textContent = cnt.total;
+  } catch {}
+
+  try {
+    const [me, sub, unread] = await Promise.all([api.me(), api.getSubStatus(), api.getUnread()]);
+    const u = me.user;
+    Auth.setUser(u);
+
+    // Premium or search limit
+    if (sub.active) {
+      document.getElementById('s-days').textContent = sub.days_left;
+    } else {
+      document.getElementById('premium-banner').style.display = 'flex';
+      document.getElementById('s-days').textContent = '—';
+
+      // Search limit
+      const bar = document.getElementById('search-limit-bar');
+      bar.style.display = 'flex';
+      const used = sub.searches_today || 0;
+      document.getElementById('searches-used').textContent = used;
+      document.getElementById('limit-fill').style.width = Math.min((used/10)*100, 100) + '%';
+    }
+
+    document.getElementById('s-msgs').textContent = unread.total;
+
+    // New users
+    const data = await api.getNewUsers();
+    const el = document.getElementById('new-users');
+    if (!data.users.length) {
+      el.innerHTML = '<div class="empty-state"><div class="icon">👥</div><p>Пока нет участников</p></div>';
+      return;
+    }
+    el.innerHTML = data.users.map(u => `
+      <div class="mini-card" onclick="window.location='/pages/partners.html'">
+        <div class="mini-card-top">
+          ${avatarEl(u, 'md')}
+          <div>
+            <div style="font-weight:700;font-size:14px;">${u.name}</div>
+            <div style="color:var(--text2);font-size:12px;">${u.age||'?'} лет • ${u.district||'Алматы'}</div>
+          </div>
+        </div>
+        <div class="mini-tags">
+          <span class="badge badge-green">${LEVELS[u.fitness_level]||'Новичок'}</span>
+          ${u.goals?`<span class="badge badge-blue">${u.goals}</span>`:''}
+        </div>
+      </div>`).join('');
+  } catch {}
+});
+</script>
+</body>
+</html>

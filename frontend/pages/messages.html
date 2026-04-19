@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Сообщения — FitPartner</title>
+<link rel="stylesheet" href="../css/style.css">
+<style>
+.chat-wrap{display:flex;height:calc(100vh - 64px);}
+.conv-list{width:290px;background:var(--dark2);border-right:var(--border);display:flex;flex-direction:column;flex-shrink:0;}
+.conv-header{padding:18px 20px;border-bottom:var(--border);font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:1px;}
+.conv-scroll{flex:1;overflow-y:auto;}
+.conv-item{display:flex;align-items:center;gap:12px;padding:14px 18px;border-bottom:1px solid rgba(255,255,255,0.04);cursor:pointer;transition:background 0.15s;}
+.conv-item:hover,.conv-item.active{background:rgba(0,255,135,0.06);}
+.ci-info{flex:1;overflow:hidden;}
+.ci-name{font-weight:600;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.ci-last{color:var(--text2);font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px;}
+.ci-unread{min-width:18px;height:18px;border-radius:9px;background:var(--neon);color:var(--dark);font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:center;padding:0 4px;}
+.chat-area{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+.chat-header{padding:14px 24px;border-bottom:var(--border);display:flex;align-items:center;gap:12px;flex-shrink:0;background:var(--dark2);}
+.chat-msgs{flex:1;overflow-y:auto;padding:20px 24px;display:flex;flex-direction:column;gap:10px;}
+.msg{max-width:68%;padding:11px 15px;border-radius:14px;font-size:14px;line-height:1.55;animation:fadeIn 0.2s ease;}
+.msg-in{background:var(--dark3);border-bottom-left-radius:4px;align-self:flex-start;}
+.msg-out{background:linear-gradient(135deg,rgba(0,255,135,0.14),rgba(0,212,255,0.1));border:1px solid rgba(0,255,135,0.18);border-bottom-right-radius:4px;align-self:flex-end;}
+.msg-time{font-size:11px;color:var(--text2);margin-top:4px;}
+.msg-img{max-width:220px;border-radius:10px;cursor:pointer;display:block;margin-top:4px;transition:opacity 0.2s;}
+.msg-img:hover{opacity:0.9;}
+.typing-bar{padding:6px 24px;font-size:12px;color:var(--text2);min-height:24px;font-style:italic;}
+.chat-input-row{padding:12px 16px;border-top:var(--border);display:flex;gap:8px;align-items:flex-end;}
+.chat-ta{flex:1;padding:12px 16px;background:var(--dark3);border:var(--border);border-radius:14px;color:var(--text);font-size:14px;font-family:'Manrope',sans-serif;outline:none;resize:none;min-height:46px;max-height:120px;}
+.chat-ta:focus{border-color:var(--neon);}
+.send-btn{width:46px;height:46px;border-radius:12px;background:linear-gradient(135deg,var(--neon),var(--neon2));border:none;cursor:pointer;color:var(--dark);font-size:20px;display:flex;align-items:center;justify-content:center;transition:transform 0.15s;flex-shrink:0;}
+.send-btn:hover{transform:scale(1.08);}
+.photo-btn{width:46px;height:46px;border-radius:12px;background:var(--dark3);border:var(--border);cursor:pointer;color:var(--text2);font-size:20px;display:flex;align-items:center;justify-content:center;transition:all 0.2s;flex-shrink:0;}
+.photo-btn:hover{border-color:var(--neon);color:var(--neon);}
+.photo-btn.locked{opacity:0.4;cursor:not-allowed;}
+.lightbox{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:500;align-items:center;justify-content:center;cursor:zoom-out;}
+.lightbox.open{display:flex;animation:fadeIn 0.2s ease;}
+.lightbox img{max-width:90vw;max-height:90vh;border-radius:12px;}
+@media(max-width:600px){.conv-list{display:none;}}
+</style>
+</head>
+<body>
+<nav class="app-nav">
+  <div class="logo">FP</div>
+  <a href="/pages/dashboard.html" class="nav-item" data-page="dashboard">🏠</a>
+  <a href="/pages/partners.html" class="nav-item" data-page="partners">🏋️</a>
+  <a href="/pages/messages.html" class="nav-item active" data-page="messages">💬<span class="notif" id="msg-badge">0</span></a>
+  <a href="/pages/profile.html" class="nav-item" data-page="profile">👤</a>
+  <div class="nav-spacer"></div>
+</nav>
+<div class="app-content" style="display:flex;flex-direction:column;">
+  <div class="page-header" style="position:static;">
+    <div class="page-title">💬 Сообщения</div>
+    <div style="color:var(--text2);font-size:12px;" id="photo-info"></div>
+  </div>
+  <div class="chat-wrap">
+    <div class="conv-list">
+      <div class="conv-header">Диалоги</div>
+      <div class="conv-scroll" id="conv-list"><div class="loading-center"><span class="spinner"></span></div></div>
+    </div>
+    <div class="chat-area" id="chat-area">
+      <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;color:var(--text2);">
+        <div style="font-size:60px;">💬</div>
+        <div style="font-size:17px;font-weight:700;color:var(--text);">Выберите диалог</div>
+        <div style="font-size:13px;">Найди партнёра и напиши первым!</div>
+        <a href="/pages/partners.html" class="btn btn-outline btn-sm">Найти партнёра →</a>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="lightbox" id="lightbox" onclick="this.classList.remove('open')"><img id="lb-img" src="" alt=""></div>
+<input type="file" id="photo-file" accept="image/*" style="display:none" onchange="sendPhoto(this)">
+<script src="../js/api.js"></script>
+<script src="https://cdn.socket.io/4.7.4/socket.io.min.js"></script>
+<script>
+let socket, curUser=null, onlineIds=[], activeChatId=null, typingTimer, convPoll;
+
+document.addEventListener('DOMContentLoaded', async () => {
+  if (!Auth.requireAuth()) return;
+  curUser = Auth.getUser();
+
+  const isPrem = Auth.isPremium();
+  document.getElementById('photo-info').textContent = isPrem ? '📷 Фото доступно' : '📷 Фото — Premium';
+
+  initSocket();
+  await loadConversations();
+  const p = new URLSearchParams(location.search);
+  if (p.get('uid')) openChat(parseInt(p.get('uid')), p.get('name')||'');
+  convPoll = setInterval(loadConversations, 12000);
+});
+
+function initSocket() {
+  socket = io();
+  socket.emit('user_online', curUser.id);
+  socket.on('online_users', ids => { onlineIds = ids.map(String); });
+  socket.on('new_message', msg => {
+    if (activeChatId && msg.sender_id === activeChatId) { appendMsg(msg, false); scrollMsgs(); }
+    loadConversations(); updateUnreadBadge();
+  });
+  socket.on('user_typing', ({ senderId }) => {
+    if (activeChatId === senderId) {
+      const b = document.getElementById('typing-bar');
+      if (b) b.textContent = 'печатает...';
+      clearTimeout(typingTimer);
+      typingTimer = setTimeout(() => { const bb=document.getElementById('typing-bar'); if(bb)bb.textContent=''; }, 2000);
+    }
+  });
+}
+
+async function loadConversations() {
+  try {
+    const data = await api.getConversations();
+    const el = document.getElementById('conv-list');
+    if (!data.conversations.length) {
+      el.innerHTML = '<div style="padding:24px;text-align:center;color:var(--text2);font-size:12px;line-height:1.7;">Нет диалогов.<br>Найди партнёра и напиши первым!</div>';
+      return;
+    }
+    el.innerHTML = data.conversations.map(c => {
+      const act = activeChatId === c.partner_id ? 'active' : '';
+      const last = c.last_message?.startsWith('[IMG]') ? '📷 Фото' : (c.last_message||'');
+      return `<div class="conv-item ${act}" onclick="openChat(${c.partner_id},'${c.name.replace(/'/g,"\\'")}')">
+        ${avatarEl(c, 'sm')}
+        <div class="ci-info"><div class="ci-name">${c.name}</div><div class="ci-last">${last}</div></div>
+        ${c.unread>0?`<div class="ci-unread">${c.unread}</div>`:''}
+      </div>`;
+    }).join('');
+  } catch {}
+}
+
+async function openChat(userId, userName) {
+  activeChatId = userId;
+  const isOnline = onlineIds.includes(String(userId));
+  const isPrem = Auth.isPremium();
+  document.getElementById('chat-area').innerHTML = `
+    <div class="chat-header">
+      <div class="avatar avatar-sm">${initials(userName)}</div>
+      <div><div style="font-weight:700;font-size:15px;">${userName}</div><div style="font-size:12px;color:var(--text2);">${isOnline?'🟢 Онлайн':'Не в сети'}</div></div>
+      <div style="flex:1;text-align:right;"><a href="/pages/partners.html" class="btn btn-ghost btn-sm">К анкетам</a></div>
+    </div>
+    <div class="chat-msgs" id="msgs-box"><div class="loading-center"><span class="spinner"></span></div></div>
+    <div class="typing-bar" id="typing-bar"></div>
+    <div class="chat-input-row">
+      <button class="photo-btn ${!isPrem?'locked':''}" onclick="${isPrem?"document.getElementById('photo-file').click()":"toast('📷 Фото доступно с Premium подпиской (от 800₸)','info')"}" title="${isPrem?'Отправить фото':'Premium — отправка фото'}">📷</button>
+      <textarea class="chat-ta" id="msg-input" placeholder="Сообщение..."
+        onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMsg()}"
+        oninput="emitTyping()"></textarea>
+      <button class="send-btn" onclick="sendMsg()">➤</button>
+    </div>`;
+  try {
+    const data = await api.getMessages(userId);
+    const box = document.getElementById('msgs-box');
+    if (!data.messages.length) {
+      box.innerHTML = '<div class="empty-state"><div class="icon">👋</div><p>Напишите первое сообщение!</p></div>';
+    } else {
+      box.innerHTML = data.messages.map(m => renderMsg(m)).join('');
+      scrollMsgs();
+    }
+  } catch(e) { console.error(e); }
+  loadConversations();
+  document.getElementById('msg-input')?.focus();
+}
+
+function renderMsg(m) {
+  const own = m.sender_id === curUser.id;
+  let content = '';
+  if (m.content?.startsWith('[IMG]')) {
+    const src = m.content.replace('[IMG]','');
+    content = `<img src="${src}" class="msg-img" onclick="openLightbox('${src}')" alt="Фото">`;
+  } else {
+    content = m.content||'';
+  }
+  return `<div class="msg ${own?'msg-out':'msg-in'}">${content}<div class="msg-time">${formatTime(m.created_at)}</div></div>`;
+}
+
+function appendMsg(m, own=true) {
+  const box = document.getElementById('msgs-box');
+  if (!box) return;
+  const emp = box.querySelector('.empty-state');
+  if (emp) box.innerHTML = '';
+  box.insertAdjacentHTML('beforeend', renderMsg({...m, sender_id: own ? curUser.id : m.sender_id}));
+}
+
+function scrollMsgs() { const b=document.getElementById('msgs-box'); if(b) b.scrollTop=b.scrollHeight; }
+function emitTyping() { if(!socket||!activeChatId) return; socket.emit('typing',{senderId:curUser.id,receiverId:activeChatId}); }
+
+async function sendMsg() {
+  const inp = document.getElementById('msg-input');
+  const text = inp?.value?.trim();
+  if (!text||!activeChatId) return;
+  inp.value = '';
+  try {
+    const data = await api.sendMessage(activeChatId, text);
+    appendMsg(data.message, true); scrollMsgs();
+    socket?.emit('send_message',{receiverId:activeChatId,message:data.message});
+    loadConversations();
+  } catch(e) { toast(e.message,'error'); }
+}
+
+async function sendPhoto(input) {
+  const file = input.files[0];
+  if (!file||!activeChatId) return;
+  input.value = '';
+  const form = new FormData();
+  form.append('photo', file);
+  try {
+    const res = await fetch('/api/messages/'+activeChatId+'/photo',{method:'POST',headers:{'Authorization':'Bearer '+Auth.getToken()},body:form});
+    const data = await res.json();
+    if (!res.ok) { toast(data.error,'error'); return; }
+    appendMsg(data.message, true); scrollMsgs();
+    socket?.emit('send_message',{receiverId:activeChatId,message:data.message});
+    loadConversations();
+  } catch(e) { toast(e.message,'error'); }
+}
+
+function openLightbox(src) {
+  document.getElementById('lb-img').src = src;
+  document.getElementById('lightbox').classList.add('open');
+}
+</script>
+</body>
+</html>
