@@ -96,10 +96,17 @@ io.on('connection', (socket) => {
 const PORT = process.env.PORT || 3000;
 
 (async () => {
-  await initDB();
-  server.listen(PORT, () => {
-    console.log(`\n💪 FitPartner запущен: http://localhost:${PORT}\n`);
-  });
+  try {
+    await initDB();
+
+    server.listen(PORT, () => {
+      console.log(`\n💪 FitPartner запущен: http://localhost:${PORT}\n`);
+    });
+
+  } catch (err) {
+    console.error('❌ Server start error:', err);
+    process.exit(1);
+  }
 })();
 
 module.exports = { app, io };
