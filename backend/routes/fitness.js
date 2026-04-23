@@ -162,15 +162,16 @@ async function getProgressData(userId) {
   const start = addDays(today, -6);
 
   const { rows } = await pool.query(`
-    SELECT
-      completed_at::date AS day,
-      COUNT(*)::int AS workouts,
-      COALESCE(SUM(calories_burned), 0)::int AS calories
-    FROM workout_logs
-    WHERE user_id=$1
-      AND completed_at::date BETWEEN $2::date AND $3::date
-    GROUP BY completed_at::date
-    ORDER BY completed_at::date ASC
+SELECT
+  (completed_at AT TIME ZONE 'Asia/Almaty')::date AS day,
+  COUNT(*)::int AS workouts,
+  COALESCE(SUM(calories_burned), 0)::int AS calories
+FROM workout_logs
+WHERE user_id=$1
+  AND (completed_at AT TIME ZONE 'Asia/Almaty')::date
+      BETWEEN $2::date AND $3::date
+GROUP BY day
+ORDER BY day ASC
   `, [userId, start, today]);
 
   const map = new Map(rows.map(r => [String(r.day).slice(0, 10), r]));
