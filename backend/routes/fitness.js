@@ -317,49 +317,53 @@ router.post('/workout/complete', auth, async (req, res, next) => {
 
     await client.query('BEGIN');
 
-// 👉 ВСТАВЬ ВОТ ЭТО
-const existing = await client.query(`
-  SELECT 1 FROM workout_logs
-  WHERE user_id = $1 AND completed_at::date = $2
-  LIMIT 1
-`, [req.user.id, today]);
+    const existing = await client.query(`
+      SELECT 1 FROM workout_logs
+      WHERE user_id = $1 AND completed_at::date = $2
+      LIMIT 1
+    `, [req.user.id, today]);
 
-let streak;
+    let streak;
 
-// если уже была тренировка
-if (existing.rows.length > 0) {
-  streak = await getStreakRow(client, req.user.id);
+    if (existing.rows.length > 0) {
+      streak = await getStreakRow(client, req.user.id);
 
-  await client.query('COMMIT');
+      await client.query('COMMIT');
 
-  return res.json({
-    message: 'Уже выполнено сегодня',
-    alreadyDone: true,
-    streak
-  });
-}
+      return res.json({
+        message: 'Уже выполнено сегодня',
+        alreadyDone: true,
+        streak
+      });
+    }
 
-// если нет — сохраняем
-await client.query(`
-  INSERT INTO workout_logs (user_id, workout_name, duration_minutes, calories_burned)
-  VALUES ($1, $2, $3, $4)
-`, [req.user.id, workoutTitle, duration, calories]);
+    await client.query(`
+      INSERT INTO workout_logs (user_id, workout_name, duration_minutes, calories_burned)
+      VALUES ($1, $2, $3, $4)
+    `, [req.user.id, workoutTitle, duration, calories]);
 
-await client.query(`
-  UPDATE workout_plans
-  SET status='completed'
-  WHERE user_id=$1 AND plan_date=$2
-`, [req.user.id, today]);
+    await client.query(`
+      UPDATE workout_plans
+      SET status='completed'
+      WHERE user_id=$1 AND plan_date=$2
+    `, [req.user.id, today]);
 
-// 🔥 теперь стрик обновится
-streak = await touchStreak(client, req.user.id, today);
+    streak = await touchStreak(client, req.user.id, today);
 
-await client.query('COMMIT');
+    await client.query('COMMIT');
 
-res.json({
-  message: 'Тренировка засчитана',
-  streak
+    res.json({
+      message: 'Тренировка засчитана',
+      streak
+    });
+  } catch (err) {
+    await client.query('ROLLBACK');
+    next(err);
+  } finally {
+    client.release();
+  }
 });
+
 // POST /api/fitness/meal
 router.post('/meal', auth, async (req, res, next) => {
   try {
