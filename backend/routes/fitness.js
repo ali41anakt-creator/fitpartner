@@ -300,6 +300,8 @@ router.get('/streak', auth, async (req, res, next) => {
 
 // POST /api/fitness/workout/complete
 router.post('/workout/complete', auth, async (req, res, next) => {
+  const client = await pool.connect();
+
   try {
     const {
       title,
@@ -308,78 +310,55 @@ router.post('/workout/complete', auth, async (req, res, next) => {
     } = req.body;
 
     const workoutTitle = String(title || 'Тренировка').trim().slice(0, 150);
-    const duration = Math.max(0, parseInt(duration_minutes, 10) || 0);
-    const calories = Math.max(0, parseInt(calories_burned, 10) || 0);
+    const duration = Math.max(0, parseInt(duration_minutes, 10) || 30);
+    const calories = Math.max(0, parseInt(calories_burned, 10) || 150);
 
     const today = getKzDate();
-    const client = await pool.connect();
 
-    try {
-      await client.query('BEGIN');
+    await client.query('BEGIN');
 
-      await client.query(`
-        INSERT INTO workout_logs (user_id, workout_name, duration_minutes, calories_burned)
-        VALUES ($1, $2, $3, $4)
-      `, [req.user.id, workoutTitle, duration, calories]);
+    // 🔥 1. ПРОВЕРКА (чтобы нельзя было 2 раза)
+    const existing = await client.query(`
+      SELECT 1 FROM workout_logs
+      WHERE user_id = $1 AND completed_at::date = $2
+      LIMIT 1
+    `, [req.user.id, today]);
 
-      await client.query(`
-        UPDATE workout_plans
-        SET status='completed'
-        WHERE user_id=$1 AND plan_date=$2
-      `, [req.user.id, today]);
-
-      // проверяем: была ли уже тренировка сегодня
-const existing = await client.query(`
-  SELECT 1 FROM workout_logs
-  WHERE user_id = $1 AND completed_at::date = $2
-  LIMIT 1
-`, [req.user.id, today]);
-
-// сохраняем тренировку
-await client.query(`
-  INSERT INTO workout_logs (user_id, workout_name, duration_minutes, calories_burned)
-  VALUES ($1, $2, $3, $4)
-`, [req.user.id, workoutTitle, duration, calories]);
-
-// обновляем план
-await client.query(`
-  UPDATE workout_plans
-  SET status='completed'
-  WHERE user_id=$1 AND plan_date=$2
-`, [req.user.id, today]);
-
-let streak;
-
-// если уже была тренировка сегодня → не увеличиваем
-if (existing.rows.length > 0) {
-  streak = await getStreakRow(client, req.user.id);
-} else {
-  streak = await touchStreak(client, req.user.id, today);
-}
-
-      await client.query('COMMIT');
-
-      res.json({
-        message: 'Тренировка сохранена',
-        completed: {
-          title: workoutTitle,
-          duration_minutes: duration,
-          calories_burned: calories
-        },
-        streak: {
-          current_streak: streak.current_streak || 0,
-          best_streak: streak.best_streak || 0,
-          last_active_date: streak.last_active_date || null
-        }
-      });
-    } catch (err) {
+    if (existing.rows.length > 0) {
       await client.query('ROLLBACK');
-      throw err;
-    } finally {
-      client.release();
+      return res.status(400).json({
+        message: 'Ты уже выполнил тренировку сегодня'
+      });
     }
+
+    // ✅ 2. СОХРАНЯЕМ ТРЕНИРОВКУ
+    await client.query(`
+      INSERT INTO workout_logs (user_id, workout_name, duration_minutes, calories_burned)
+      VALUES ($1, $2, $3, $4)
+    `, [req.user.id, workoutTitle, duration, calories]);
+
+    // ✅ 3. ОБНОВЛЯЕМ ПЛАН
+    await client.query(`
+      UPDATE workout_plans
+      SET status='completed'
+      WHERE user_id=$1 AND plan_date=$2
+    `, [req.user.id, today]);
+
+    // 🔥 4. СТРИК
+    const streak = await touchStreak(client, req.user.id, today);
+
+    await client.query('COMMIT');
+
+    res.json({
+      message: 'Тренировка засчитана',
+      streak
+    });
+
   } catch (err) {
+    await client.query('ROLLBACK');
     next(err);
+  } finally {
+    client.release();
   }
 });
 
