@@ -125,6 +125,57 @@ const initDB = async () => {
 
     await client.query(`CREATE INDEX IF NOT EXISTS idx_sub_hist_user ON subscription_history(user_id);`);
 
+        // Fitness tables
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS workout_plans (
+        id SERIAL PRIMARY KEY,
+        user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        title VARCHAR(150) NOT NULL,
+        description TEXT,
+        plan_date DATE NOT NULL,
+        status VARCHAR(20) DEFAULT 'planned',
+        created_at TIMESTAMPTZ DEFAULT NOW(),
+        UNIQUE(user_id, plan_date)
+      );
+    `);
+
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS workout_logs (
+        id SERIAL PRIMARY KEY,
+        user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        workout_name VARCHAR(150) NOT NULL,
+        duration_minutes INTEGER DEFAULT 0,
+        calories_burned INTEGER DEFAULT 0,
+        completed_at TIMESTAMPTZ DEFAULT NOW()
+      );
+    `);
+
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS meal_logs (
+        id SERIAL PRIMARY KEY,
+        user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        meal_name VARCHAR(150) NOT NULL,
+        calories INTEGER DEFAULT 0,
+        protein INTEGER DEFAULT 0,
+        fat INTEGER DEFAULT 0,
+        carbs INTEGER DEFAULT 0,
+        eaten_at TIMESTAMPTZ DEFAULT NOW()
+      );
+    `);
+
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS user_streaks (
+        user_id INTEGER PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
+        current_streak INTEGER DEFAULT 0,
+        best_streak INTEGER DEFAULT 0,
+        last_active_date DATE
+      );
+    `);
+
+    await client.query(`CREATE INDEX IF NOT EXISTS idx_workout_plans_user_date ON workout_plans(user_id, plan_date);`);
+    await client.query(`CREATE INDEX IF NOT EXISTS idx_workout_logs_user_date ON workout_logs(user_id, completed_at);`);
+    await client.query(`CREATE INDEX IF NOT EXISTS idx_meal_logs_user_date ON meal_logs(user_id, eaten_at);`);
+    
     await client.query('COMMIT');
     console.log('✅ Database initialized');
   } catch (err) {

@@ -52,6 +52,7 @@ app.use('/api/messages', require('./routes/messages'));
 app.use('/api/subscription', require('./routes/subscription'));
 app.use('/api/contact', require('./routes/contact'));
 app.use('/api/admin', require('./routes/admin'));
+app.use('/api/fitness', require('./routes/fitness'));
 
 // Проверка здоровья сервера
 app.get('/api/health', (req, res) => {
