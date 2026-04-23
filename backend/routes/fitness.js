@@ -402,24 +402,6 @@ router.post('/meal', auth, async (req, res, next) => {
     next(err);
   }
 });
-router.post('/workout/complete', async (req, res) => {
-  try {
-    const { title, duration_minutes, calories_burned } = req.body;
 
-    const userId = 1; // временно
-
-    await pool.query(
-      `INSERT INTO workouts (user_id, title, duration_minutes, calories_burned, created_at)
-       VALUES ($1, $2, $3, $4, NOW())`,
-      [userId, title, duration_minutes, calories_burned]
-    );
-
-    res.json({ message: 'Тренировка сохранена' });
-
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: 'Ошибка сервера' });
-  }
-});
 
 module.exports = router;
