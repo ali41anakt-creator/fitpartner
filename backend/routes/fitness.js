@@ -230,17 +230,6 @@ router.get('/week-plan', auth, async (req, res, next) => {
   }
 });
 
-// GET /api/fitness/progress
-router.get('/progress', auth, async (req, res, next) => {
-  try {
-    const data = await getProgressData(req.user.id);
-    res.json(data);
-  } catch (err) {
-    console.error('PROGRESS ERROR:', err); // важно!
-    next(err);
-  }
-});
-
 async function getProgressData(userId) {
   try {
     const today = getKzDate();

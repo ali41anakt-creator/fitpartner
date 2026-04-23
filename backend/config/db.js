@@ -1,23 +1,23 @@
 const { Pool } = require('pg');
 require('dotenv').config();
 
+const useSSL = process.env.DATABASE_URL && process.env.DATABASE_URL.includes('render.com');
+
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: {
-    rejectUnauthorized: false
-  }
-});
-
-pool.connect((err, client, release) => {
-  if (err) {
-    console.error('❌ PostgreSQL Error:', err.message);
-    process.exit(1);
-  }
-  release();
-  console.log('✅ PostgreSQL connected');
+  ssl: useSSL ? { rejectUnauthorized: false } : false
 });
 
 const initDB = async () => {
+  // Проверяем соединение
+  try {
+    await pool.query('SELECT 1');
+    console.log('✅ PostgreSQL connected');
+  } catch (err) {
+    console.error('❌ PostgreSQL Error:', err.message);
+    throw err;
+  }
+
   const client = await pool.connect();
   try {
     await client.query('BEGIN');
