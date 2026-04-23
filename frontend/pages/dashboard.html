@@ -573,6 +573,16 @@ function saveXP() {
   }));
 }
 
+function formatDate(dateStr) {
+  const date = new Date(dateStr);
+  if (Number.isNaN(date.getTime())) return dateStr || '—';
+  return date.toLocaleDateString('ru-RU', {
+    weekday: 'short',
+    day: 'numeric',
+    month: 'short'
+  });
+}
+
 function renderWeekPlan(plans) {
   const el = document.getElementById('week-plan');
 
@@ -686,20 +696,18 @@ async function loadFitness() {
 
   renderChart(progressRes);
   renderWeekPlan(weekRes.plans || []);
+  
+  // 🔥 КНОПКА "ВЫПОЛНИТЬ"
+  const btn = document.getElementById('fill-today-btn');
+
+  if (fitnessToday?.plan?.status === 'completed') {
+    btn.disabled = true;
+    btn.textContent = 'Уже выполнено';
+  } else {
+    btn.disabled = false;
+    btn.textContent = 'Выполнить сегодня';
+  }
 }
-
-// 👉 ВСТАВЬ ЭТО СЮДА
-const btn = document.getElementById('fill-today-btn');
-
-if (fitnessToday?.plan?.status === 'completed') {
-  btn.disabled = true;
-  btn.textContent = 'Уже выполнено';
-} else {
-  btn.disabled = false;
-  btn.textContent = 'Выполнить сегодня';
-}
-
-
 async function loadDashboard() {
   if (!Auth.requireAuth()) return;
   const user = Auth.getUser();
@@ -804,28 +812,27 @@ document.addEventListener('DOMContentLoaded', async () => {
       const calories = parseInt(document.getElementById('workout-calories').value, 10) || 150;
       // эффект на карточку "сегодня"
       const todayCard = document.querySelector('.today-card');
-      if (todayCard) {
-        todayCard.classList.add('done-effect');
-        setTimeout(() => {
-          todayCard.classList.remove('done-effect');
-        }, 800);
+if (todayCard) {
+  todayCard.classList.add('done-effect');
+  setTimeout(() => {
+    todayCard.classList.remove('done-effect');
+  }, 800);
 }
-      const res = await api.completeWorkout({
+
+const res = await api.completeWorkout({
   title,
   duration_minutes: duration,
   calories_burned: calories
 });
 
 if (res.alreadyDone) {
+  document.getElementById('fill-today-btn').disabled = true;
   toast('Уже выполнено сегодня ✅', 'success');
   return;
-  document.getElementById('fill-today-btn').disabled = true;
 }
 
 toast(res.message || 'Тренировка сохранена', 'success');
-
-      toast(res.message || 'Тренировка сохранена', 'success');
-      // добавляем XP
+// добавляем XP
 userXP += 10;
 
 const needed = getXPForLevel(userLevel);
@@ -851,21 +858,6 @@ updateXPUI();
       const duration = parseInt(document.getElementById('workout-duration').value, 10) || 30;
       const calories = parseInt(document.getElementById('workout-calories').value, 10) || 150;
 
-      const res = await api.completeWorkout({
-  title,
-  duration_minutes: duration,
-  calories_burned: calories
-});
-
-if (res.alreadyDone) {
-  toast('Уже выполнено сегодня ✅', 'success');
-  return;
-  document.getElementById('fill-today-btn').disabled = true;
-}
-
-toast(res.message || 'Тренировка сохранена', 'success');
-
-      toast(res.message || 'Тренировка сохранена', 'success');
       document.getElementById('workout-name').value = '';
       document.getElementById('workout-duration').value = '';
       document.getElementById('workout-calories').value = '';
@@ -873,6 +865,11 @@ toast(res.message || 'Тренировка сохранена', 'success');
     } catch (e) {
       toast(e.message, 'error');
     }
+    await api.completeWorkout({
+  title,
+  duration_minutes: duration,
+  calories_burned: calories
+});
   });
 
   document.getElementById('save-meal-btn').addEventListener('click', async () => {
