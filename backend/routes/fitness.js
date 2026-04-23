@@ -157,45 +157,7 @@ async function touchStreak(client, userId, today) {
   return updated[0];
 }
 
-async function getProgressData(userId) {
-  const today = getKzDate();
-  const start = addDays(today, -6);
 
-  const { rows } = await pool.query(`
-SELECT
-  (completed_at AT TIME ZONE 'Asia/Almaty')::date AS day,
-  COUNT(*)::int AS workouts,
-  COALESCE(SUM(calories_burned), 0)::int AS calories
-FROM workout_logs
-WHERE user_id=$1
-  AND (completed_at AT TIME ZONE 'Asia/Almaty')::date
-      BETWEEN $2::date AND $3::date
-GROUP BY day
-ORDER BY day ASC
-  `, [userId, start, today]);
-
-  const map = new Map(rows.map(r => [String(r.day).slice(0, 10), r]));
-
-  const labels = [];
-  const workouts = [];
-  const calories = [];
-
-  for (let i = 0; i < 7; i++) {
-    const d = addDays(start, i);
-    const row = map.get(d);
-    labels.push(dayLabel(d));
-    workouts.push(row ? Number(row.workouts) : 0);
-    calories.push(row ? Number(row.calories) : 0);
-  }
-
-  return {
-    labels,
-    workouts,
-    calories,
-    total_workouts: workouts.reduce((a, b) => a + b, 0),
-    total_calories: calories.reduce((a, b) => a + b, 0)
-  };
-}
 
 // GET /api/fitness/today
 router.get('/today', auth, async (req, res, next) => {
@@ -274,6 +236,71 @@ router.get('/progress', auth, async (req, res, next) => {
     const data = await getProgressData(req.user.id);
     res.json(data);
   } catch (err) {
+    console.error('PROGRESS ERROR:', err); // важно!
+    next(err);
+  }
+});
+
+async function getProgressData(userId) {
+  try {
+    const today = getKzDate();
+    const start = addDays(today, -6);
+
+    const { rows } = await pool.query(`
+      SELECT
+        (completed_at AT TIME ZONE 'Asia/Almaty')::date AS day,
+        COUNT(*)::int AS workouts,
+        COALESCE(SUM(calories_burned), 0)::int AS calories
+      FROM workout_logs
+      WHERE user_id=$1
+        AND (completed_at AT TIME ZONE 'Asia/Almaty')::date
+            BETWEEN $2::date AND $3::date
+      GROUP BY (completed_at AT TIME ZONE 'Asia/Almaty')::date
+      ORDER BY day ASC
+    `, [userId, start, today]);
+    console.log('ROWS:', rows);
+
+    const map = new Map(
+  rows.map(r => [
+    new Date(r.day).toISOString().slice(0, 10),
+    r
+  ])
+);
+
+    const labels = [];
+    const workouts = [];
+    const calories = [];
+
+    for (let i = 0; i < 7; i++) {
+      const d = addDays(start, i);
+      const row = map.get(d);
+
+      labels.push(dayLabel(d));
+      workouts.push(row ? Number(row.workouts) : 0);
+      calories.push(row ? Number(row.calories) : 0);
+    }
+    console.log('ROWS:', rows);
+    return {
+      labels,
+      workouts,
+      calories,
+      total_workouts: workouts.reduce((a, b) => a + b, 0),
+      total_calories: calories.reduce((a, b) => a + b, 0)
+    };
+
+  } catch (err) {
+    console.error('getProgressData ERROR:', err);
+    throw err;
+  }
+}
+
+// GET /api/fitness/progress
+router.get('/progress', auth, async (req, res, next) => {
+  try {
+    const data = await getProgressData(req.user.id);
+    res.json(data);
+  } catch (err) {
+    console.error('PROGRESS ERROR:', err); // 👈 важно
     next(err);
   }
 });
@@ -319,10 +346,11 @@ router.post('/workout/complete', auth, async (req, res, next) => {
     await client.query('BEGIN');
 
     const existing = await client.query(`
-      SELECT 1 FROM workout_logs
-      WHERE user_id = $1 AND completed_at::date = $2
-      LIMIT 1
-    `, [req.user.id, today]);
+  SELECT 1 FROM workout_logs
+  WHERE user_id = $1
+    AND (completed_at AT TIME ZONE 'Asia/Almaty')::date = $2
+  LIMIT 1
+`, [req.user.id, today]);
 
     let streak;
 
