@@ -807,6 +807,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 document.getElementById('fill-today-btn').addEventListener('click', async () => {
   try {
+    // ✅ значения всегда объявлены
     const title =
       fitnessToday?.plan?.title ||
       document.getElementById('workout-name').value.trim() ||
@@ -818,59 +819,57 @@ document.getElementById('fill-today-btn').addEventListener('click', async () => 
     const calories =
       parseInt(document.getElementById('workout-calories').value, 10) || 150;
 
+    // ✅ эффект карточки
     const todayCard = document.querySelector('.today-card');
     if (todayCard) {
       todayCard.classList.add('done-effect');
       setTimeout(() => todayCard.classList.remove('done-effect'), 800);
     }
 
+    // ✅ ОДИН вызов API
     const res = await api.completeWorkout({
       title,
       duration_minutes: duration,
       calories_burned: calories
     });
 
-    if (res.alreadyDone) {
+    // ✅ если уже выполнено
+    if (res?.alreadyDone) {
       document.getElementById('fill-today-btn').disabled = true;
       toast('Уже выполнено сегодня ✅', 'success');
       return;
     }
 
-    toast(res.message || 'Тренировка сохранена', 'success');
+    // ✅ успех
+    toast(res?.message || 'Тренировка сохранена', 'success');
 
+    // ✅ XP система
     userXP += 10;
 
     const needed = getXPForLevel(userLevel);
+
     if (userXP >= needed) {
       userXP -= needed;
       userLevel++;
-      toast('🔥 Новый уровень! Lv.' + userLevel, 'success');
+      toast(`🔥 Новый уровень! Lv.${userLevel}`, 'success');
     }
 
     saveXP();
     updateXPUI();
 
+    // ✅ очистка полей (по желанию)
+    document.getElementById('workout-name').value = '';
+    document.getElementById('workout-duration').value = '';
+    document.getElementById('workout-calories').value = '';
+
+    // ✅ обновляем всё
     await loadFitness();
+
   } catch (e) {
-    toast(e.message, 'error');
+    console.error(e);
+    toast(e.message || 'Ошибка', 'error');
   }
 });
-
-  document.getElementById('save-workout-btn').addEventListener('click', async () => {
-    try {
-      const title = document.getElementById('workout-name').value.trim() || fitnessToday?.plan?.title || 'Тренировка';
-      const duration = parseInt(document.getElementById('workout-duration').value, 10) || 30;
-      const calories = parseInt(document.getElementById('workout-calories').value, 10) || 150;
-
-      document.getElementById('workout-name').value = '';
-      document.getElementById('workout-duration').value = '';
-      document.getElementById('workout-calories').value = '';
-      await loadFitness();
-    } catch (e) {
-      toast(e.message, 'error');
-    }
-    
-  });
 
   document.getElementById('save-meal-btn').addEventListener('click', async () => {
     try {
