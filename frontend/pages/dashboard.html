@@ -811,10 +811,18 @@ document.addEventListener('DOMContentLoaded', async () => {
         }, 800);
 }
       const res = await api.completeWorkout({
-        title,
-        duration_minutes: duration,
-        calories_burned: calories
-      });
+  title,
+  duration_minutes: duration,
+  calories_burned: calories
+});
+
+if (res.alreadyDone) {
+  toast('Уже выполнено сегодня ✅', 'success');
+  return;
+  document.getElementById('fill-today-btn').disabled = true;
+}
+
+toast(res.message || 'Тренировка сохранена', 'success');
 
       toast(res.message || 'Тренировка сохранена', 'success');
       // добавляем XP
@@ -844,10 +852,18 @@ updateXPUI();
       const calories = parseInt(document.getElementById('workout-calories').value, 10) || 150;
 
       const res = await api.completeWorkout({
-        title,
-        duration_minutes: duration,
-        calories_burned: calories
-      });
+  title,
+  duration_minutes: duration,
+  calories_burned: calories
+});
+
+if (res.alreadyDone) {
+  toast('Уже выполнено сегодня ✅', 'success');
+  return;
+  document.getElementById('fill-today-btn').disabled = true;
+}
+
+toast(res.message || 'Тренировка сохранена', 'success');
 
       toast(res.message || 'Тренировка сохранена', 'success');
       document.getElementById('workout-name').value = '';
