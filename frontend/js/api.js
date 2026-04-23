@@ -54,6 +54,14 @@ const api = {
   sendMessage:  (uid, content) => request('/api/messages/' + uid, 'POST', { content }),
   getUnread:    () => request('/api/messages/unread'),
 
+    // Fitness
+  getFitnessToday: () => request('/api/fitness/today'),
+  getFitnessWeekPlan: () => request('/api/fitness/week-plan'),
+  getFitnessProgress: () => request('/api/fitness/progress'),
+  getFitnessStreak: () => request('/api/fitness/streak'),
+  completeWorkout: (d) => request('/api/fitness/workout/complete', 'POST', d),
+  addMeal: (d) => request('/api/fitness/meal', 'POST', d),
+
   // Subscription
   getPlans:    () => request('/api/subscription/plans'),
   getSubStatus:() => request('/api/subscription/status'),
