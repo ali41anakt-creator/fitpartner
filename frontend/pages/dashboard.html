@@ -869,11 +869,7 @@ document.getElementById('fill-today-btn').addEventListener('click', async () => 
     } catch (e) {
       toast(e.message, 'error');
     }
-    await api.completeWorkout({
-  title,
-  duration_minutes: duration,
-  calories_burned: calories
-});
+    
   });
 
   document.getElementById('save-meal-btn').addEventListener('click', async () => {
