@@ -317,51 +317,49 @@ router.post('/workout/complete', auth, async (req, res, next) => {
 
     await client.query('BEGIN');
 
-    // 🔥 1. ПРОВЕРКА (чтобы нельзя было 2 раза)
-    const existing = await client.query(`
-      SELECT 1 FROM workout_logs
-      WHERE user_id = $1 AND completed_at::date = $2
-      LIMIT 1
-    `, [req.user.id, today]);
+// 👉 ВСТАВЬ ВОТ ЭТО
+const existing = await client.query(`
+  SELECT 1 FROM workout_logs
+  WHERE user_id = $1 AND completed_at::date = $2
+  LIMIT 1
+`, [req.user.id, today]);
 
-    if (existing.rows.length > 0) {
-      await client.query('ROLLBACK');
-      return res.status(400).json({
-        message: 'Ты уже выполнил тренировку сегодня'
-      });
-    }
+let streak;
 
-    // ✅ 2. СОХРАНЯЕМ ТРЕНИРОВКУ
-    await client.query(`
-      INSERT INTO workout_logs (user_id, workout_name, duration_minutes, calories_burned)
-      VALUES ($1, $2, $3, $4)
-    `, [req.user.id, workoutTitle, duration, calories]);
+// если уже была тренировка
+if (existing.rows.length > 0) {
+  streak = await getStreakRow(client, req.user.id);
 
-    // ✅ 3. ОБНОВЛЯЕМ ПЛАН
-    await client.query(`
-      UPDATE workout_plans
-      SET status='completed'
-      WHERE user_id=$1 AND plan_date=$2
-    `, [req.user.id, today]);
+  await client.query('COMMIT');
 
-    // 🔥 4. СТРИК
-    const streak = await touchStreak(client, req.user.id, today);
+  return res.json({
+    message: 'Уже выполнено сегодня',
+    alreadyDone: true,
+    streak
+  });
+}
 
-    await client.query('COMMIT');
+// если нет — сохраняем
+await client.query(`
+  INSERT INTO workout_logs (user_id, workout_name, duration_minutes, calories_burned)
+  VALUES ($1, $2, $3, $4)
+`, [req.user.id, workoutTitle, duration, calories]);
 
-    res.json({
-      message: 'Тренировка засчитана',
-      streak
-    });
+await client.query(`
+  UPDATE workout_plans
+  SET status='completed'
+  WHERE user_id=$1 AND plan_date=$2
+`, [req.user.id, today]);
 
-  } catch (err) {
-    await client.query('ROLLBACK');
-    next(err);
-  } finally {
-    client.release();
-  }
+// 🔥 теперь стрик обновится
+streak = await touchStreak(client, req.user.id, today);
+
+await client.query('COMMIT');
+
+res.json({
+  message: 'Тренировка засчитана',
+  streak
 });
-
 // POST /api/fitness/meal
 router.post('/meal', auth, async (req, res, next) => {
   try {
