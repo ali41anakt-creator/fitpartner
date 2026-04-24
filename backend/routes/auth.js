@@ -95,6 +95,17 @@ router.put('/profile', auth, [
     }
 
     const updated = await User.update(req.user.id, req.body);
+
+    // Если изменились цели или уровень — сбрасываем план на текущую неделю,
+    // чтобы при следующем заходе seedWeekPlan сгенерировал новый персональный план
+    if (req.body.goals !== undefined || req.body.fitness_level !== undefined) {
+      const today = new Date().toLocaleDateString('sv-SE', { timeZone: 'Asia/Almaty' });
+      await pool.query(
+        `DELETE FROM workout_plans WHERE user_id=$1 AND plan_date >= $2 AND status='planned'`,
+        [req.user.id, today]
+      );
+    }
+
     res.json({ message: 'Профиль обновлён', user: User.safe(updated) });
   } catch (err) { next(err); }
 });

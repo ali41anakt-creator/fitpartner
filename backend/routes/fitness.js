@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { pool } = require('../config/db');
 const auth = require('../middleware/auth');
+const requirePremium = require('../middleware/requirePremium');
 
 function getKzDate() {
   return new Date().toLocaleDateString('sv-SE', { timeZone: 'Asia/Almaty' });
@@ -162,7 +163,7 @@ async function touchStreak(client, userId, today) {
 
 
 // GET /api/fitness/today
-router.get('/today', auth, async (req, res, next) => {
+router.get('/today', auth, requirePremium, async (req, res, next) => {
   try {
     const client = await pool.connect();
     try {
@@ -207,7 +208,7 @@ router.get('/today', auth, async (req, res, next) => {
 });
 
 // GET /api/fitness/week-plan
-router.get('/week-plan', auth, async (req, res, next) => {
+router.get('/week-plan', auth, requirePremium, async (req, res, next) => {
   try {
     const client = await pool.connect();
     try {
@@ -286,7 +287,7 @@ async function getProgressData(userId) {
 }
 
 // GET /api/fitness/progress
-router.get('/progress', auth, async (req, res, next) => {
+router.get('/progress', auth, requirePremium, async (req, res, next) => {
   try {
     const data = await getProgressData(req.user.id);
     res.json(data);
@@ -297,7 +298,7 @@ router.get('/progress', auth, async (req, res, next) => {
 });
 
 // GET /api/fitness/streak
-router.get('/streak', auth, async (req, res, next) => {
+router.get('/streak', auth, requirePremium, async (req, res, next) => {
   try {
     const client = await pool.connect();
     try {
@@ -318,7 +319,7 @@ router.get('/streak', auth, async (req, res, next) => {
 });
 
 // POST /api/fitness/workout/complete
-router.post('/workout/complete', auth, async (req, res, next) => {
+router.post('/workout/complete', auth, requirePremium, async (req, res, next) => {
   const client = await pool.connect();
 
   try {
@@ -385,7 +386,7 @@ router.post('/workout/complete', auth, async (req, res, next) => {
 });
 
 // POST /api/fitness/meal
-router.post('/meal', auth, async (req, res, next) => {
+router.post('/meal', auth, requirePremium, async (req, res, next) => {
   try {
     const {
       meal_name,

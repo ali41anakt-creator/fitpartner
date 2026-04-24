@@ -407,6 +407,48 @@
     </div>
   </div>
 
+  <!-- PREMIUM GATE — скрыт если подписка активна -->
+  <div id="premium-gate" style="display:none; margin:0 32px 24px;">
+    <div style="
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+      border: 1px solid var(--neon);
+      border-radius: 16px;
+      padding: 40px 32px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    ">
+      <div style="font-size: 48px; margin-bottom: 16px;">🔒</div>
+      <div style="font-size: 22px; font-weight: 800; color: var(--text1); margin-bottom: 8px;">
+        Фитнес-трекер — для подписчиков
+      </div>
+      <div style="color: var(--text2); font-size: 14px; max-width: 420px; margin: 0 auto 24px;">
+        Персональный план тренировок, трекер калорий, статистика прогресса и стрик — 
+        доступны только при активной подписке.
+      </div>
+      <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-bottom: 24px;">
+        <div style="background: rgba(0,255,174,0.08); border: 1px solid rgba(0,255,174,0.2); border-radius: 10px; padding: 12px 20px; font-size: 13px; color: var(--text1);">
+          ✅ Персональный план тренировок
+        </div>
+        <div style="background: rgba(0,255,174,0.08); border: 1px solid rgba(0,255,174,0.2); border-radius: 10px; padding: 12px 20px; font-size: 13px; color: var(--text1);">
+          ✅ Трекер калорий и питания
+        </div>
+        <div style="background: rgba(0,255,174,0.08); border: 1px solid rgba(0,255,174,0.2); border-radius: 10px; padding: 12px 20px; font-size: 13px; color: var(--text1);">
+          ✅ Стрик и история прогресса
+        </div>
+        <div style="background: rgba(0,255,174,0.08); border: 1px solid rgba(0,255,174,0.2); border-radius: 10px; padding: 12px 20px; font-size: 13px; color: var(--text1);">
+          ✅ Поиск партнёров без лимитов
+        </div>
+      </div>
+      <a href="/pages/subscription.html" class="btn btn-primary" style="font-size: 16px; padding: 12px 32px;">
+        Подключить подписку →
+      </a>
+    </div>
+  </div>
+
+  <!-- FITNESS CONTENT — показывается только подписчикам -->
+  <div id="fitness-content" style="display:none;">
+
   <div class="fitness-grid">
     <div class="panel-card">
       <div class="panel-title">Сегодня для тебя</div>
@@ -520,6 +562,8 @@
       <div class="loading-center"><span class="spinner"></span></div>
     </div>
   </div>
+
+  </div> <!-- /fitness-content -->
 
   <div class="new-users-sec" style="margin-top:8px;">
     <div class="sec-header">
@@ -738,9 +782,16 @@ async function loadDashboard() {
 
     if (sub.active) {
       document.getElementById('s-days').textContent = sub.days_left;
+      // Подписка активна — показываем фитнес, скрываем paywall
+      document.getElementById('premium-gate').style.display = 'none';
+      document.getElementById('fitness-content').style.display = 'block';
+      await loadFitness();
     } else {
       document.getElementById('premium-banner').style.display = 'flex';
       document.getElementById('s-days').textContent = '—';
+      // Нет подписки — скрываем фитнес, показываем paywall
+      document.getElementById('fitness-content').style.display = 'none';
+      document.getElementById('premium-gate').style.display = 'block';
 
       const bar = document.getElementById('search-limit-bar');
       bar.style.display = 'flex';
@@ -778,7 +829,6 @@ async function loadDashboard() {
     await loadFitness();
   } catch (err) {
     console.error(err);
-    try { await loadFitness(); } catch {}
   }
 }
 
