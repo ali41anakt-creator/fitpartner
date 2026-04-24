@@ -132,6 +132,8 @@ async function touchStreak(client, userId, today) {
     const { rows: created } = await client.query(`
       INSERT INTO user_streaks (user_id, current_streak, best_streak, last_active_date)
       VALUES ($1, 1, 1, $2)
+      ON CONFLICT (user_id) DO UPDATE
+        SET current_streak = 1, best_streak = GREATEST(user_streaks.best_streak, 1), last_active_date = $2
       RETURNING *
     `, [userId, today]);
     return created[0];

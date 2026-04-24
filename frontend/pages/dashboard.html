@@ -871,6 +871,10 @@ document.getElementById('fill-today-btn').addEventListener('click', async () => 
   }
 });
 
+  document.getElementById('save-workout-btn').addEventListener('click', async () => {
+    document.getElementById('fill-today-btn').click();
+  });
+
   document.getElementById('save-meal-btn').addEventListener('click', async () => {
     try {
       const meal = {
